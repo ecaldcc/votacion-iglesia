@@ -1,0 +1,442 @@
+$primary-color: #667eea;
+$secondary-color: #764ba2;
+$success-color: #28a745;
+$danger-color: #dc3545;
+$text-dark: #333;
+$text-light: #666;
+$border-color: #ddd;
+$background-light: #f8f9ff;
+
+.campaign-form-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 30px;
+
+  .form-header {
+    max-width: 1200px;
+    margin: 0 auto 30px;
+
+    .btn-back {
+      padding: 10px 20px;
+      background: white;
+      border: 2px solid $border-color;
+      border-radius: 8px;
+      color: $text-dark;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        border-color: $primary-color;
+        color: $primary-color;
+      }
+
+      i {
+        margin-right: 8px;
+      }
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: $text-dark;
+      margin: 0;
+    }
+  }
+
+  .form-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+
+    .form-section {
+      margin-bottom: 40px;
+      padding-bottom: 40px;
+      border-bottom: 2px solid $border-color;
+
+      &:last-of-type {
+        border-bottom: none;
+      }
+
+      h3 {
+        font-size: 1.5rem;
+        color: $text-dark;
+        margin-bottom: 25px;
+
+        i {
+          color: $primary-color;
+          margin-right: 10px;
+        }
+      }
+
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+
+        .btn-add {
+          padding: 10px 20px;
+          background: linear-gradient(135deg, $success-color 0%, darken($success-color, 10%) 100%);
+          color: white;
+          border: none;
+          border-radius: 8px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba($success-color, 0.3);
+          }
+
+          i {
+            margin-right: 8px;
+          }
+        }
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+
+        label {
+          display: block;
+          margin-bottom: 8px;
+          color: $text-dark;
+          font-weight: 600;
+        }
+
+        input,
+        textarea {
+          width: 100%;
+          padding: 12px 15px;
+          border: 2px solid $border-color;
+          border-radius: 8px;
+          font-size: 1rem;
+          font-family: inherit;
+          transition: all 0.3s ease;
+
+          &:focus {
+            outline: none;
+            border-color: $primary-color;
+            box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+          }
+
+          &.error {
+            border-color: $danger-color;
+          }
+        }
+
+        textarea {
+          resize: vertical;
+          min-height: 100px;
+        }
+
+        input[type="number"] {
+          max-width: 200px;
+        }
+
+        input[type="date"] {
+          max-width: 250px;
+        }
+
+        .error-message {
+          display: block;
+          color: $danger-color;
+          font-size: 0.85rem;
+          margin-top: 5px;
+        }
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+      }
+
+      .alert-error {
+        background: rgba($danger-color, 0.1);
+        border: 2px solid $danger-color;
+        padding: 15px;
+        border-radius: 8px;
+        color: $danger-color;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        i {
+          font-size: 1.2rem;
+        }
+      }
+    }
+
+    .candidate-form {
+      background: $background-light;
+      padding: 25px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+
+      h4 {
+        color: $text-dark;
+        margin-bottom: 20px;
+      }
+
+      .form-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+
+        button {
+          padding: 10px 25px;
+          border: none;
+          border-radius: 8px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+
+          i {
+            margin-right: 8px;
+          }
+        }
+
+        .btn-save {
+          background: $success-color;
+          color: white;
+
+          &:hover {
+            background: darken($success-color, 10%);
+          }
+        }
+
+        .btn-cancel {
+          background: $border-color;
+          color: $text-dark;
+
+          &:hover {
+            background: darken($border-color, 10%);
+          }
+        }
+      }
+    }
+
+    .candidates-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+
+      .candidate-item {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 20px;
+        background: $background-light;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+
+        &:hover {
+          box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .candidate-avatar {
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, $primary-color 0%, $secondary-color 100%);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-size: 1.5rem;
+          overflow: hidden;
+          flex-shrink: 0;
+
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+        }
+
+        .candidate-info {
+          flex: 1;
+
+          h4 {
+            font-size: 1.1rem;
+            color: $text-dark;
+            margin: 0 0 5px 0;
+          }
+
+          p {
+            color: $text-light;
+            font-size: 0.9rem;
+            margin: 0;
+            line-height: 1.4;
+          }
+        }
+
+        .candidate-actions {
+          display: flex;
+          gap: 10px;
+
+          button {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+
+            &:first-child {
+              background: rgba($primary-color, 0.1);
+              color: $primary-color;
+
+              &:hover {
+                background: $primary-color;
+                color: white;
+              }
+            }
+
+            &:last-child {
+              background: rgba($danger-color, 0.1);
+              color: $danger-color;
+
+              &:hover {
+                background: $danger-color;
+                color: white;
+              }
+            }
+          }
+        }
+      }
+
+      .no-candidates {
+        text-align: center;
+        padding: 60px 20px;
+
+        i {
+          font-size: 60px;
+          color: $text-light;
+          margin-bottom: 15px;
+        }
+
+        p {
+          color: $text-light;
+          font-size: 1rem;
+        }
+      }
+    }
+
+    .form-footer {
+      display: flex;
+      gap: 15px;
+      justify-content: flex-end;
+      padding-top: 30px;
+
+      button {
+        padding: 15px 40px;
+        border: none;
+        border-radius: 10px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        i {
+          margin-right: 10px;
+        }
+      }
+
+      .btn-submit {
+        background: linear-gradient(135deg, $primary-color 0%, $secondary-color 100%);
+        color: white;
+
+        &:hover:not(:disabled) {
+          transform: translateY(-3px);
+          box-shadow: 0 10px 25px rgba($primary-color, 0.3);
+        }
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      }
+
+      .btn-cancel-form {
+        background: transparent;
+        color: $text-dark;
+        border: 2px solid $border-color;
+
+        &:hover:not(:disabled) {
+          border-color: $danger-color;
+          color: $danger-color;
+        }
+      }
+    }
+  }
+
+  .loading-container {
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid $background-light;
+      border-top-color: $primary-color;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    p {
+      color: $text-light;
+      font-size: 1.1rem;
+    }
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .campaign-form-page {
+    padding: 15px;
+
+    .form-container {
+      padding: 20px;
+
+      .form-section .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .candidates-list .candidate-item {
+        flex-direction: column;
+        text-align: center;
+
+        .candidate-actions {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+
+      .form-footer {
+        flex-direction: column;
+
+        button {
+          width: 100%;
+        }
+      }
+    }
+  }
+}

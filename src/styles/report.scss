@@ -1,0 +1,651 @@
+$primary-color: #667eea;
+$secondary-color: #764ba2;
+$success-color: #28a745;
+$danger-color: #dc3545;
+$gold-color: #ffd700;
+$text-dark: #333;
+$text-light: #666;
+$border-color: #ddd;
+$background-light: #f8f9ff;
+
+.campaign-report-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 30px;
+
+  .report-header {
+    max-width: 1400px;
+    margin: 0 auto 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .btn-back,
+    .btn-print {
+      padding: 10px 20px;
+      background: white;
+      border: 2px solid $border-color;
+      border-radius: 8px;
+      color: $text-dark;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+        border-color: $primary-color;
+        color: $primary-color;
+      }
+
+      i {
+        margin-right: 8px;
+      }
+    }
+
+    h1 {
+      font-size: 2rem;
+      color: $text-dark;
+      margin: 0;
+    }
+  }
+
+  .report-container {
+    max-width: 1400px;
+    margin: 0 auto;
+
+    .campaign-info-card {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+      margin-bottom: 30px;
+
+      .info-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+
+        h2 {
+          font-size: 1.8rem;
+          color: $text-dark;
+          margin: 0;
+        }
+
+        .status-badge {
+          padding: 8px 20px;
+          border-radius: 25px;
+          font-weight: 600;
+
+          &.habilitada {
+            background: rgba($success-color, 0.1);
+            color: $success-color;
+          }
+
+          &.finalizada {
+            background: rgba($text-light, 0.1);
+            color: $text-light;
+          }
+
+          &.deshabilitada {
+            background: rgba($danger-color, 0.1);
+            color: $danger-color;
+          }
+        }
+      }
+
+      .description {
+        color: $text-light;
+        font-size: 1.1rem;
+        line-height: 1.6;
+        margin-bottom: 20px;
+      }
+
+      .info-dates {
+        display: flex;
+        gap: 30px;
+        padding-top: 20px;
+        border-top: 1px solid $border-color;
+
+        .date-item {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          color: $text-light;
+
+          i {
+            color: $primary-color;
+            font-size: 1.2rem;
+          }
+        }
+      }
+    }
+
+    .stats-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+
+      .stat-box {
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 20px;
+
+        .stat-icon {
+          width: 60px;
+          height: 60px;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.8rem;
+          color: white;
+        }
+
+        &.blue .stat-icon {
+          background: linear-gradient(135deg, $primary-color 0%, $secondary-color 100%);
+        }
+
+        &.green .stat-icon {
+          background: linear-gradient(135deg, $success-color 0%, darken($success-color, 10%) 100%);
+        }
+
+        &.purple .stat-icon {
+          background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%);
+        }
+
+        &.gold .stat-icon {
+          background: linear-gradient(135deg, $gold-color 0%, darken($gold-color, 15%) 100%);
+        }
+
+        .stat-content {
+          h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: $text-dark;
+            margin: 0 0 5px 0;
+          }
+
+          p {
+            font-size: 0.9rem;
+            color: $text-light;
+            margin: 0;
+          }
+        }
+      }
+    }
+
+    .winner-section {
+      margin-bottom: 30px;
+
+      .winner-card {
+        background: linear-gradient(135deg, $gold-color 0%, darken($gold-color, 10%) 100%);
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba($gold-color, 0.3);
+        text-align: center;
+        color: white;
+
+        .trophy-icon {
+          font-size: 4rem;
+          margin-bottom: 20px;
+          animation: bounce 2s infinite;
+        }
+
+        .winner-info {
+          h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            opacity: 0.9;
+          }
+
+          h2 {
+            font-size: 2.5rem;
+            margin: 10px 0;
+            font-weight: 700;
+          }
+
+          p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+          }
+        }
+      }
+    }
+
+    .charts-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+      gap: 30px;
+      margin-bottom: 30px;
+
+      .chart-card {
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+
+        h3 {
+          font-size: 1.3rem;
+          color: $text-dark;
+          margin-bottom: 20px;
+
+          i {
+            color: $primary-color;
+            margin-right: 10px;
+          }
+        }
+
+        .chart-container {
+          &.pie {
+            height: 400px;
+          }
+
+          &.bar {
+            height: 350px;
+          }
+        }
+      }
+    }
+
+    .candidates-results {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+      margin-bottom: 30px;
+
+      h3 {
+        font-size: 1.5rem;
+        color: $text-dark;
+        margin-bottom: 25px;
+
+        i {
+          color: $primary-color;
+          margin-right: 10px;
+        }
+      }
+
+      .candidates-table {
+        overflow-x: auto;
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+
+          thead {
+            background: $background-light;
+
+            tr th {
+              padding: 15px;
+              text-align: left;
+              font-weight: 600;
+              color: $text-dark;
+              border-bottom: 2px solid $border-color;
+            }
+          }
+
+          tbody {
+            tr {
+              border-bottom: 1px solid $border-color;
+
+              &:hover {
+                background: rgba($primary-color, 0.05);
+              }
+
+              td {
+                padding: 15px;
+                color: $text-dark;
+
+                &.position {
+                  font-weight: 700;
+                  font-size: 1.1rem;
+
+                  .gold-trophy {
+                    color: $gold-color;
+                    font-size: 1.3rem;
+                  }
+                }
+
+                &.candidate-name {
+                  font-weight: 600;
+                  font-size: 1.05rem;
+                }
+
+                &.votes {
+                  font-weight: 700;
+                  color: $primary-color;
+                  font-size: 1.1rem;
+                }
+
+                &.percentage {
+                  font-weight: 600;
+                  color: $success-color;
+                }
+
+                &.progress-cell {
+                  min-width: 200px;
+
+                  .progress-bar {
+                    width: 100%;
+                    height: 25px;
+                    background: $background-light;
+                    border-radius: 20px;
+                    overflow: hidden;
+
+                    .progress-fill {
+                      height: 100%;
+                      background: linear-gradient(135deg, $primary-color 0%, $secondary-color 100%);
+                      transition: width 0.5s ease;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .votes-list-section {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+      margin-bottom: 30px;
+
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+
+        h3 {
+          font-size: 1.5rem;
+          color: $text-dark;
+          margin: 0;
+
+          i {
+            color: $primary-color;
+            margin-right: 10px;
+          }
+        }
+
+        .search-box {
+          position: relative;
+          width: 350px;
+
+          i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: $text-light;
+          }
+
+          input {
+            width: 100%;
+            padding: 10px 15px 10px 45px;
+            border: 2px solid $border-color;
+            border-radius: 8px;
+            font-size: 0.95rem;
+
+            &:focus {
+              outline: none;
+              border-color: $primary-color;
+              box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+            }
+          }
+        }
+      }
+
+      .votes-table {
+        overflow-x: auto;
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+
+          thead {
+            background: $background-light;
+
+            tr th {
+              padding: 12px 15px;
+              text-align: left;
+              font-weight: 600;
+              color: $text-dark;
+              font-size: 0.9rem;
+              border-bottom: 2px solid $border-color;
+            }
+          }
+
+          tbody {
+            tr {
+              border-bottom: 1px solid $border-color;
+
+              &:hover {
+                background: rgba($primary-color, 0.03);
+              }
+
+              td {
+                padding: 12px 15px;
+                color: $text-dark;
+                font-size: 0.9rem;
+
+                &.no-data {
+                  text-align: center;
+                  padding: 40px;
+                  color: $text-light;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .additional-info {
+      background: white;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+
+      .info-box {
+        h4 {
+          font-size: 1.2rem;
+          color: $text-dark;
+          margin-bottom: 15px;
+
+          i {
+            color: $primary-color;
+            margin-right: 10px;
+          }
+        }
+
+        p {
+          color: $text-light;
+          line-height: 1.8;
+          margin: 8px 0;
+
+          strong {
+            color: $text-dark;
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
+
+  .loading-container,
+  .error-container {
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid $background-light;
+      border-top-color: $primary-color;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    i {
+      font-size: 80px;
+      color: $danger-color;
+      margin-bottom: 20px;
+    }
+
+    h3 {
+      color: $text-dark;
+      margin-bottom: 20px;
+    }
+
+    p {
+      color: $text-light;
+      font-size: 1.1rem;
+    }
+
+    .btn-back {
+      padding: 12px 30px;
+      background: $primary-color;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      margin-top: 20px;
+
+      &:hover {
+        background: darken($primary-color, 10%);
+      }
+    }
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+// Estilos para impresión
+@media print {
+  .campaign-report-page {
+    background: white;
+    padding: 0;
+
+    .no-print {
+      display: none !important;
+    }
+
+    .report-container {
+      max-width: 100%;
+
+      .campaign-info-card,
+      .stats-section,
+      .winner-section,
+      .charts-section,
+      .candidates-results,
+      .votes-list-section,
+      .additional-info {
+        box-shadow: none;
+        page-break-inside: avoid;
+        margin-bottom: 20px;
+      }
+
+      .charts-section {
+        grid-template-columns: 1fr;
+        
+        .chart-container {
+          height: 300px !important;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .campaign-report-page {
+    .report-container {
+      .charts-section {
+        grid-template-columns: 1fr;
+      }
+
+      .votes-list-section .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+
+        .search-box {
+          width: 100%;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .campaign-report-page {
+    padding: 15px;
+
+    .report-header {
+      flex-direction: column;
+      gap: 15px;
+      text-align: center;
+
+      h1 {
+        font-size: 1.5rem;
+      }
+    }
+
+    .report-container {
+      .campaign-info-card .info-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+      }
+
+      .stats-section {
+        grid-template-columns: 1fr;
+      }
+
+      .winner-section .winner-card {
+        padding: 30px 20px;
+
+        .trophy-icon {
+          font-size: 3rem;
+        }
+
+        .winner-info h2 {
+          font-size: 2rem;
+        }
+      }
+
+      .charts-section .chart-card .chart-container {
+        height: 300px !important;
+      }
+
+      .candidates-results,
+      .votes-list-section {
+        .candidates-table,
+        .votes-table {
+          table {
+            min-width: 800px;
+          }
+        }
+      }
+    }
+  }
+}

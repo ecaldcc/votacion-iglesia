@@ -1,0 +1,557 @@
+$primary-color: #667eea;
+$secondary-color: #764ba2;
+$success-color: #28a745;
+$danger-color: #dc3545;
+$text-dark: #333;
+$text-light: #666;
+$border-color: #ddd;
+$background-light: #f8f9ff;
+
+.voters-management-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+
+  .admin-navbar {
+    background: linear-gradient(135deg, $primary-color 0%, $secondary-color 100%);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+
+    .navbar-content {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .navbar-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: white;
+
+        i {
+          font-size: 1.6rem;
+        }
+      }
+
+      .navbar-user {
+        display: flex;
+        gap: 15px;
+
+        button {
+          padding: 10px 20px;
+          background: rgba(white, 0.2);
+          color: white;
+          border: 2px solid white;
+          border-radius: 8px;
+          cursor: pointer;
+          font-weight: 600;
+          transition: all 0.3s ease;
+
+          &:hover {
+            background: white;
+            color: $primary-color;
+          }
+
+          i {
+            margin-right: 5px;
+          }
+        }
+      }
+    }
+  }
+
+  .management-container {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 40px 30px;
+
+    .page-header {
+      margin-bottom: 40px;
+
+      h1 {
+        font-size: 2.5rem;
+        color: $text-dark;
+        margin-bottom: 10px;
+
+        i {
+          color: $primary-color;
+          margin-right: 15px;
+        }
+      }
+
+      p {
+        font-size: 1.1rem;
+        color: $text-light;
+      }
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 25px;
+      margin-bottom: 40px;
+
+      .stat-card {
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 20px;
+
+        .stat-icon {
+          width: 70px;
+          height: 70px;
+          border-radius: 15px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 2rem;
+          color: white;
+        }
+
+        &.blue .stat-icon {
+          background: linear-gradient(135deg, $primary-color 0%, $secondary-color 100%);
+        }
+
+        &.green .stat-icon {
+          background: linear-gradient(135deg, $success-color 0%, darken($success-color, 10%) 100%);
+        }
+
+        &.red .stat-icon {
+          background: linear-gradient(135deg, $danger-color 0%, darken($danger-color, 10%) 100%);
+        }
+
+        &.purple .stat-icon {
+          background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%);
+        }
+
+        .stat-info {
+          h3 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: $text-dark;
+            margin: 0 0 5px 0;
+          }
+
+          p {
+            font-size: 0.95rem;
+            color: $text-light;
+            margin: 0;
+          }
+        }
+      }
+    }
+
+    .filters-section {
+      background: white;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+      margin-bottom: 30px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      align-items: center;
+
+      .search-box {
+        flex: 1;
+        min-width: 300px;
+        position: relative;
+
+        i {
+          position: absolute;
+          left: 15px;
+          top: 50%;
+          transform: translateY(-50%);
+          color: $text-light;
+        }
+
+        input {
+          width: 100%;
+          padding: 12px 15px 12px 45px;
+          border: 2px solid $border-color;
+          border-radius: 8px;
+          font-size: 1rem;
+
+          &:focus {
+            outline: none;
+            border-color: $primary-color;
+            box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+          }
+        }
+      }
+
+      .filter-buttons {
+        display: flex;
+        gap: 10px;
+
+        button {
+          padding: 10px 20px;
+          background: white;
+          border: 2px solid $border-color;
+          border-radius: 8px;
+          cursor: pointer;
+          font-weight: 600;
+          color: $text-dark;
+          transition: all 0.3s ease;
+
+          i {
+            margin-right: 8px;
+          }
+
+          &:hover {
+            border-color: $primary-color;
+            color: $primary-color;
+          }
+
+          &.active {
+            background: linear-gradient(135deg, $primary-color 0%, $secondary-color 100%);
+            border-color: $primary-color;
+            color: white;
+          }
+        }
+      }
+
+      .sort-select {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        label {
+          font-weight: 600;
+          color: $text-dark;
+          white-space: nowrap;
+
+          i {
+            margin-right: 5px;
+            color: $primary-color;
+          }
+        }
+
+        select {
+          padding: 10px 15px;
+          border: 2px solid $border-color;
+          border-radius: 8px;
+          font-size: 1rem;
+          cursor: pointer;
+          background: white;
+
+          &:focus {
+            outline: none;
+            border-color: $primary-color;
+          }
+        }
+      }
+    }
+
+    .voters-table-section {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+      margin-bottom: 30px;
+
+      .table-header {
+        margin-bottom: 25px;
+
+        h3 {
+          font-size: 1.5rem;
+          color: $text-dark;
+        }
+      }
+
+      .voters-table {
+        overflow-x: auto;
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+
+          thead {
+            background: $background-light;
+
+            tr th {
+              padding: 15px;
+              text-align: left;
+              font-weight: 600;
+              color: $text-dark;
+              font-size: 0.95rem;
+              border-bottom: 2px solid $border-color;
+              white-space: nowrap;
+            }
+          }
+
+          tbody {
+            tr {
+              border-bottom: 1px solid $border-color;
+              transition: all 0.2s ease;
+
+              &:hover {
+                background: rgba($primary-color, 0.05);
+              }
+
+              &.inactive-row {
+                opacity: 0.6;
+                background: rgba($text-light, 0.05);
+              }
+
+              td {
+                padding: 15px;
+                color: $text-dark;
+
+                &.colegiado {
+                  font-weight: 600;
+                  color: $primary-color;
+                }
+
+                &.name {
+                  font-weight: 500;
+                }
+
+                &.email {
+                  color: $text-light;
+                  font-size: 0.9rem;
+                }
+
+                &.dpi {
+                  font-family: monospace;
+                  font-size: 0.9rem;
+                }
+
+                &.text-center {
+                  text-align: center;
+                }
+
+                .vote-badge {
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 5px;
+                  padding: 5px 12px;
+                  background: rgba($primary-color, 0.1);
+                  border-radius: 20px;
+                  color: $primary-color;
+                  font-size: 0.85rem;
+                  font-weight: 600;
+                }
+
+                .status-badge {
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 5px;
+                  padding: 6px 15px;
+                  border-radius: 20px;
+                  font-size: 0.85rem;
+                  font-weight: 600;
+
+                  &.active {
+                    background: rgba($success-color, 0.1);
+                    color: $success-color;
+                  }
+
+                  &.inactive {
+                    background: rgba($danger-color, 0.1);
+                    color: $danger-color;
+                  }
+                }
+
+                .action-buttons {
+                  display: flex;
+                  gap: 8px;
+
+                  .btn-toggle {
+                    padding: 8px 16px;
+                    border: none;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-weight: 600;
+                    font-size: 0.85rem;
+                    transition: all 0.2s ease;
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
+
+                    &.btn-activate {
+                      background: rgba($success-color, 0.1);
+                      color: $success-color;
+
+                      &:hover {
+                        background: $success-color;
+                        color: white;
+                      }
+                    }
+
+                    &.btn-deactivate {
+                      background: rgba($danger-color, 0.1);
+                      color: $danger-color;
+
+                      &:hover {
+                        background: $danger-color;
+                        color: white;
+                      }
+                    }
+                  }
+                }
+
+                &.no-data {
+                  text-align: center;
+                  padding: 60px 20px;
+
+                  i {
+                    font-size: 60px;
+                    color: $text-light;
+                    display: block;
+                    margin-bottom: 15px;
+                  }
+
+                  p {
+                    color: $text-light;
+                    font-size: 1rem;
+                    margin: 0;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .info-panel {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 20px;
+
+      .info-card {
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+
+        h4 {
+          font-size: 1.2rem;
+          color: $text-dark;
+          margin-bottom: 15px;
+
+          i {
+            color: $primary-color;
+            margin-right: 10px;
+          }
+        }
+
+        ul {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+
+          li {
+            padding: 10px 0;
+            color: $text-light;
+            line-height: 1.6;
+            border-bottom: 1px solid $border-color;
+
+            &:last-child {
+              border-bottom: none;
+            }
+
+            &::before {
+              content: "•";
+              color: $primary-color;
+              font-weight: bold;
+              display: inline-block;
+              width: 1em;
+              margin-right: 10px;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .loading-container {
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid $background-light;
+      border-top-color: $primary-color;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    p {
+      color: $text-light;
+      font-size: 1.1rem;
+    }
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 1024px) {
+  .voters-management-page {
+    .management-container {
+      .voters-table-section .voters-table table {
+        min-width: 1200px;
+      }
+
+      .info-panel {
+        grid-template-columns: 1fr;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .voters-management-page {
+    .admin-navbar .navbar-content {
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .management-container {
+      padding: 20px 15px;
+
+      .page-header h1 {
+        font-size: 2rem;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .filters-section {
+        flex-direction: column;
+        align-items: stretch;
+
+        .search-box {
+          min-width: 100%;
+        }
+
+        .filter-buttons {
+          width: 100%;
+          flex-wrap: wrap;
+
+          button {
+            flex: 1;
+          }
+        }
+      }
+    }
+  }
+}
