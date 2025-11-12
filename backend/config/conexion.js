@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
 
 const options = {
-  serverSelectionTimeoutMS: 5000, // Timeout si no puede conectar al servidor
-  socketTimeoutMS: 45000, // Timeout para operaciones individuales
+  serverSelectionTimeoutMS: 10000, // Timeout si no puede conectar al servidor
+  socketTimeoutMS: 60000, // Timeout para operaciones individuales
   maxPoolSize: 25,  // ← AGREGAR: Pool para 20 iglesias simultáneas
   minPoolSize: 5,   // ← AGREGAR: Mantener 5 conexiones mínimas
   retryWrites: true, // ← AGREGAR: Reintentar escrituras fallidas

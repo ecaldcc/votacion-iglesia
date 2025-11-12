@@ -130,67 +130,103 @@ const CampaignDetail: React.FC = () => {
   };
 
   const handleVote = async () => {
-    if (!selectedCandidate || !campaign) return;
-    
-    if (votosRestantes && votosRestantes.votosDisponibles <= 0) {
-      setSuccessMessage('Ya has usado todos tus votos disponibles');
-      setShowSuccessCheck(true);
-      setTimeout(() => {
-        setShowSuccessCheck(false);
-        setSuccessMessage('');
-      }, 2000);
-      return;
-    }
+  if (!selectedCandidate || !campaign) return;
+  
+  if (votosRestantes && votosRestantes.votosDisponibles <= 0) {
+    setSuccessMessage('Ya has usado todos tus votos disponibles');
+    setShowSuccessCheck(true);
+    setTimeout(() => {
+      setShowSuccessCheck(false);
+      setSuccessMessage('');
+    }, 2000);
+    return;
+  }
 
+  // ✅ FUNCIÓN DE RETRY
+  const MAX_RETRIES = 3;
+  let attempt = 0;
+
+  const tryVote = async (): Promise<any> => {
     try {
       setVoting(true);
       
-      // 1. Registrar voto
       const response = await votesAPI.cast({
         campaignId: campaign._id,
         candidateId: selectedCandidate
       });
       
-      const candidateName = campaign.candidatos.find(c => c._id === selectedCandidate)?.nombre;
-      
-      // 2. ✅ MOSTRAR CHECKMARK CON MENSAJE
-      setSuccessMessage('¡Voto registrado exitosamente!');
-      setShowSuccessCheck(true);
-      
-      // 3. Limpiar selección
-      setSelectedCandidate(null);
-      
-      // 4. Actualizar datos
-      await Promise.all([
-        loadCampaignData(),
-        loadVotosRestantes()
-      ]);
-      
-      // 5. Si quedan votos, ocultar después de 2 segundos
-      if (response.votosRestantes > 0) {
-        setTimeout(() => {
-          setShowSuccessCheck(false);
-          setSuccessMessage('');
-        }, 2000);
-      } else {
-        // Si no quedan votos, mostrar mensaje y recargar
-        setTimeout(() => {
-          setSuccessMessage('Has completado todos tus votos. Recargando...');
-        }, 1500);
-        
-        setTimeout(() => {
-          window.location.reload();
-        }, 3500);
-      }
+      return response;
       
     } catch (error: any) {
-      console.error('Error al votar:', error);
-      setShowSuccessCheck(false);
-      setSuccessMessage('');
-      alert('❌ Error al registrar el voto:\n' + (error.response?.data?.message || 'Por favor, intenta nuevamente'));
-    } finally {
-      setVoting(false);
+      attempt++;
+      
+      // Si el error es retryable (409 o 408) y quedan intentos
+      const isRetryable = error.response?.data?.retryable || 
+                          error.response?.status === 408 || 
+                          error.response?.status === 409;
+      
+      if (isRetryable && attempt < MAX_RETRIES) {
+        console.log(`⚠️ Reintentando voto (intento ${attempt + 1}/${MAX_RETRIES})...`);
+        
+        // Esperar un poco antes de reintentar (backoff exponencial)
+        await new Promise(resolve => setTimeout(resolve, 500 * attempt));
+        
+        return tryVote(); // Reintentar
+      }
+      
+      // Si ya no hay más intentos o no es retryable, lanzar error
+      throw error;
     }
+  };
+
+  try {
+    //  INTENTAR VOTAR CON RETRY AUTOMÁTICO
+    const response = await tryVote();
+    
+    const candidateName = campaign.candidatos.find(c => c._id === selectedCandidate)?.nombre;
+    
+    // Mostrar checkmark
+    setSuccessMessage('¡Voto registrado exitosamente!');
+    setShowSuccessCheck(true);
+    
+    // Limpiar selección
+    setSelectedCandidate(null);
+    
+    // Actualizar datos
+    await Promise.all([
+      loadCampaignData(),
+      loadVotosRestantes()
+    ]);
+    
+    // Si quedan votos, ocultar después de 2 segundos
+    if (response.votosRestantes > 0) {
+      setTimeout(() => {
+        setShowSuccessCheck(false);
+        setSuccessMessage('');
+      }, 2000);
+    } else {
+      // Si no quedan votos, mostrar mensaje y recargar
+      setTimeout(() => {
+        setSuccessMessage('Has completado todos tus votos. Recargando...');
+      }, 1500);
+      
+      setTimeout(() => {
+        window.location.reload();
+      }, 3500);
+    }
+    
+  } catch (error: any) {
+    console.error('Error al votar:', error);
+    setShowSuccessCheck(false);
+    setSuccessMessage('');
+    
+    // Mensaje de error más amigable
+    const errorMessage = error.response?.data?.message || 
+                        'Error al registrar el voto. Por favor, intenta nuevamente.';
+    alert('❌ ' + errorMessage);
+  } finally {
+    setVoting(false);
+  }
   };
 
   const updateTimeRemaining = () => {
@@ -276,7 +312,7 @@ const CampaignDetail: React.FC = () => {
   return (
     <div className="campaign-detail-page">
       
-      {/* ✅ CHECKMARK ANIMADO CON MENSAJE - NUEVO */}
+      {/*  CHECKMARK ANIMADO CON MENSAJE - NUEVO */}
       {showSuccessCheck && (
         <div className="success-overlay">
           <div className="success-content">

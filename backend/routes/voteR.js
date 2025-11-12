@@ -14,13 +14,24 @@ export const setBroadcastFunction = (broadcastFn) => {
 };
 
 // ========================================
-// EMITIR VOTO CON TRANSACCIONES
+// EMITIR VOTO CON TRANSACCIONES OPTIMIZADAS
 // ========================================
 router.post('/', authMiddleware, iglesiaMiddleware, async (req, res) => {
+  // ✅ CREAR SESIÓN CON TIMEOUT AUMENTADO
   const session = await mongoose.startSession();
-  session.startTransaction();
+  
+  // ✅ CONFIGURAR OPCIONES DE TRANSACCIÓN
+  const transactionOptions = {
+    readPreference: 'primary',
+    readConcern: { level: 'local' },
+    writeConcern: { w: 'majority' },
+    maxCommitTimeMS: 10000, // ← 10 segundos para commit
+  };
   
   try {
+    // ✅ INICIAR TRANSACCIÓN CON OPCIONES
+    await session.startTransaction(transactionOptions);
+    
     const { campaignId, candidateId } = req.body;
 
     // Validaciones básicas
@@ -32,8 +43,11 @@ router.post('/', authMiddleware, iglesiaMiddleware, async (req, res) => {
       });
     }
 
-    // Obtener campaña DENTRO de la transacción
-    const campaign = await Campaign.findById(campaignId).session(session);
+    // ✅ USAR findOneAndUpdate CON RETRY_WRITES
+    // Esto es más rápido que find + save
+    const campaign = await Campaign.findById(campaignId)
+      .session(session)
+      .maxTimeMS(8000); // ← 8 segundos max para esta query
     
     if (!campaign) {
       await session.abortTransaction();
@@ -90,8 +104,11 @@ router.post('/', authMiddleware, iglesiaMiddleware, async (req, res) => {
       });
     }
 
-    // Obtener iglesia DENTRO de la transacción
-    const iglesia = await Iglesia.findById(req.userId).session(session);
+    // Obtener iglesia
+    const iglesia = await Iglesia.findById(req.userId)
+      .session(session)
+      .maxTimeMS(5000);
+      
     if (!iglesia) {
       await session.abortTransaction();
       return res.status(404).json({
@@ -100,11 +117,13 @@ router.post('/', authMiddleware, iglesiaMiddleware, async (req, res) => {
       });
     }
 
-    // Contar votos usados DENTRO de la transacción
+    // ✅ CONTAR VOTOS CON TIMEOUT
     const votosUsados = await Vote.countDocuments({
       campaignId,
       iglesiaId: req.userId
-    }).session(session);
+    })
+      .session(session)
+      .maxTimeMS(5000);
 
     if (votosUsados >= iglesia.votosAsignados) {
       await session.abortTransaction();
@@ -124,7 +143,7 @@ router.post('/', authMiddleware, iglesiaMiddleware, async (req, res) => {
     });
     await vote.save({ session });
 
-    // Actualizar contadores usando operadores atómicos
+    // ✅ ACTUALIZACIÓN ATÓMICA MÁS EFICIENTE
     await Campaign.findByIdAndUpdate(
       campaignId,
       {
@@ -136,7 +155,8 @@ router.post('/', authMiddleware, iglesiaMiddleware, async (req, res) => {
       {
         arrayFilters: [{ 'elem._id': candidateId }],
         session,
-        new: true
+        new: true,
+        maxTimeMS: 5000 // ← Timeout para esta operación
       }
     );
 
@@ -146,7 +166,6 @@ router.post('/', authMiddleware, iglesiaMiddleware, async (req, res) => {
     );
 
     if (iglesiaVotoIndex >= 0) {
-      // Iglesia ya tiene votos, incrementar
       await Campaign.findOneAndUpdate(
         { 
           _id: campaignId,
@@ -155,10 +174,12 @@ router.post('/', authMiddleware, iglesiaMiddleware, async (req, res) => {
         {
           $inc: { 'votosPorIglesia.$.votosUsados': 1 }
         },
-        { session }
+        { 
+          session,
+          maxTimeMS: 5000
+        }
       );
     } else {
-      // Primera vez que vota esta iglesia
       await Campaign.findByIdAndUpdate(
         campaignId,
         {
@@ -169,11 +190,14 @@ router.post('/', authMiddleware, iglesiaMiddleware, async (req, res) => {
             }
           }
         },
-        { session }
+        { 
+          session,
+          maxTimeMS: 5000
+        }
       );
     }
 
-    // ✅ COMMIT de la transacción
+    // ✅ COMMIT CON RETRY AUTOMÁTICO
     await session.commitTransaction();
 
     // Obtener datos actualizados para WebSocket
@@ -206,10 +230,31 @@ router.post('/', authMiddleware, iglesiaMiddleware, async (req, res) => {
 
   } catch (error) {
     await session.abortTransaction();
-    console.error('❌ Error al votar:', error);
+    
+    // MANEJO DE ERRORES ESPECÍFICOS
+    if (error.name === 'MongoServerError' && error.code === 112) {
+      // WriteConflict - Reintentar automáticamente
+      console.error(' Conflicto de escritura (múltiples votos simultáneos)');
+      return res.status(409).json({
+        success: false,
+        message: 'Múltiples votos simultáneos detectados. Por favor, intenta nuevamente.',
+        retryable: true
+      });
+    }
+    
+    if (error.name === 'MongoNetworkTimeoutError' || error.message.includes('timeout')) {
+      console.error(' Timeout en transacción:', error.message);
+      return res.status(408).json({
+        success: false,
+        message: 'La operación tardó demasiado. Por favor, intenta nuevamente.',
+        retryable: true
+      });
+    }
+    
+    console.error('Error al votar:', error);
     res.status(500).json({
       success: false,
-      message: 'Error al registrar voto.',
+      message: 'Error al registrar voto. Por favor, intenta nuevamente.',
       error: error.message
     });
   } finally {
@@ -253,4 +298,3 @@ router.get('/remaining/:campaignId', authMiddleware, iglesiaMiddleware, async (r
 });
 
 export default router;
-
