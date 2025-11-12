@@ -221,4 +221,4 @@ json{
 
 ## El backend del sistema esta completo, por lo que el JWT_EXPIRATION esta configurado para 5 minutos
 # URL
-https://votacion-backend-w7t6.onrender.com
+https://votacion-iglesia.onrender.com

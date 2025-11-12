@@ -15,21 +15,21 @@ import Vote from '../models/vote.js';
 
 const seedDatabase = async () => {
   try {
-    console.log('🌱 Iniciando seed de base de datos...\n');
+    console.log('Iniciando seed de base de datos...\n');
 
     await connectDB();
 
-    console.log('🧹 Limpiando base de datos...');
+    console.log(' Limpiando base de datos...');
     await User.deleteMany({});
     await Iglesia.deleteMany({});
     await Campaign.deleteMany({});
     await Vote.deleteMany({});
-    console.log('✅ Base de datos limpiada\n');
+    console.log('Base de datos limpiada\n');
 
     // ========================================
     // CREAR USUARIO ADMINISTRADOR
     // ========================================
-    console.log('👤 Creando usuario administrador...');
+    console.log(' Creando usuario administrador...');
     const admin = await User.create({
       numeroColegiado: 'ADMIN',
       nombreCompleto: 'Administrador Sistema',
@@ -40,7 +40,7 @@ const seedDatabase = async () => {
       role: 'admin',
       isActive: true
     });
-    console.log('✅ Administrador creado\n');
+    console.log('Administrador creado\n');
 
     // ========================================
     // CREAR 20 IGLESIAS
