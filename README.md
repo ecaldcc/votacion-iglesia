@@ -284,4 +284,4 @@ https://drive.google.com/drive/folders/1VyD1ORFHw93SdVxuCaThzd1qHznYgPd_?usp=sha
 
 ##  Desarrollado por
 
-- Edwar Daniel Calderon Cinco 9490-20-26601
+- Edwar Daniel Calderon Cinco
