@@ -24,7 +24,7 @@ export const authMiddleware = async (req, res, next) => {
       // Buscar en iglesias
       user = await Iglesia.findById(decoded.userId).select('-password');
       if (user) {
-        user.role = 'iglesia'; // Agregar role para consistencia
+        user.role = 'iglesia';
       }
     }
     
@@ -39,6 +39,16 @@ export const authMiddleware = async (req, res, next) => {
       return res.status(401).json({
         success: false,
         message: 'Usuario inactivo.'
+      });
+    }
+
+    // ✅ VALIDAR SESSION ID
+    if (user.currentSessionId !== decoded.sessionId) {
+      return res.status(401).json({
+        success: false,
+        message: 'Sesión inválida. Has iniciado sesión en otro dispositivo.',
+        sessionExpired: true,
+        reason: 'other_device'
       });
     }
 
@@ -81,5 +91,4 @@ export const iglesiaMiddleware = (req, res, next) => {
   next();
 };
 
-// MANTENER COMPATIBILIDAD (alias)
 export const voterMiddleware = iglesiaMiddleware;

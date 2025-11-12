@@ -12,7 +12,7 @@ const iglesiaSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-    index: true,
+    index: true
   },
   votosAsignados: {
     type: Number,
@@ -26,7 +26,20 @@ const iglesiaSchema = new mongoose.Schema({
   isActive: {
     type: Boolean,
     default: true,
-    index:true,
+    index: true
+  },
+  // ✅ NUEVO: Campo para sesión única
+  currentSessionId: {
+    type: String,
+    default: null
+  },
+  lastLoginAt: {
+    type: Date,
+    default: null
+  },
+  lastLoginDevice: {
+    type: String,
+    default: null
   },
   votedCampaigns: [{
     campaignId: {

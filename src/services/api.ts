@@ -28,9 +28,8 @@ api.interceptors.response.use(
   (response) => response,
   (error: AxiosError<any>) => {
     if (error.response?.status === 401) {
-      const isExpired = error.response?.data?.expired || 
-                       error.response?.data?.message?.includes('expirado') ||
-                       error.response?.data?.message?.includes('expired');
+      const isExpired = error.response?.data?.expired;
+      const isOtherDevice = error.response?.data?.reason === 'other_device';
       
       localStorage.removeItem('token');
       localStorage.removeItem('userRole');
@@ -39,7 +38,9 @@ api.interceptors.response.use(
       if (!sessionExpiredAlertShown) {
         sessionExpiredAlertShown = true;
         
-        if (isExpired) {
+        if (isOtherDevice) {
+          alert('⚠️ Tu sesión ha sido cerrada porque iniciaste sesión en otro dispositivo.');
+        } else if (isExpired) {
           alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
         } else {
           alert('Tu sesión no es válida. Por favor, inicia sesión nuevamente.');

@@ -1,18 +1,24 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto'; // ← AGREGAR
 import User from '../models/user.js';
 import Iglesia from '../models/iglesia.js';
 import { authMiddleware } from '../middleware/auth-jwt.js';
 
 const router = express.Router();
 
-const generateToken = (userId, role) => {
+const generateToken = (userId, role, sessionId) => { // ← Agregar sessionId
   const expiresIn = process.env.JWT_EXPIRATION || '24h';
   return jwt.sign(
-    { userId, role },
+    { userId, role, sessionId }, // ← Incluir sessionId en token
     process.env.JWT_SECRET || 'secret_key_default',
     { expiresIn }
   );
+};
+
+// ✅ FUNCIÓN PARA GENERAR SESSION ID ÚNICO
+const generateSessionId = () => {
+  return crypto.randomBytes(32).toString('hex');
 };
 
 // Login para iglesias y admin
@@ -20,7 +26,7 @@ router.post('/login', async (req, res) => {
   try {
     const { codigo, nombre, password, userType } = req.body;
 
-    console.log('📝 Login attempt:', { codigo, nombre, userType }); // Debug
+    console.log('🔐 Login attempt:', { codigo, nombre, userType });
 
     if (!codigo || !password) {
       return res.status(400).json({
@@ -28,6 +34,10 @@ router.post('/login', async (req, res) => {
         message: 'Código y contraseña son requeridos.'
       });
     }
+
+    // ✅ OBTENER INFO DEL DISPOSITIVO
+    const userAgent = req.get('user-agent') || 'Desconocido';
+    const deviceInfo = userAgent.substring(0, 100); // Limitar a 100 caracteres
 
     // ========== VERIFICAR SI ES ADMIN ==========
     if (userType === 'admin' || codigo === 'ADMIN' || !nombre) {
@@ -59,9 +69,18 @@ router.post('/login', async (req, res) => {
         });
       }
 
-      const token = generateToken(admin._id, admin.role);
+      // ✅ GENERAR NUEVO SESSION ID
+      const sessionId = generateSessionId();
+      
+      // ✅ ACTUALIZAR SESSION EN DB
+      admin.currentSessionId = sessionId;
+      admin.lastLoginAt = new Date();
+      admin.lastLoginDevice = deviceInfo;
+      await admin.save();
 
-      console.log('✅ Admin login exitoso');
+      const token = generateToken(admin._id, admin.role, sessionId);
+
+      console.log('✅ Admin login exitoso - Nueva sesión creada');
       
       return res.json({
         success: true,
@@ -82,7 +101,6 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // Buscar iglesia por código Y nombre
     const iglesia = await Iglesia.findOne({ codigo, nombre });
 
     if (!iglesia) {
@@ -95,7 +113,6 @@ router.post('/login', async (req, res) => {
 
     console.log('🔍 Iglesia encontrada:', iglesia.nombre);
 
-    // Comparar password
     const isMatch = await iglesia.comparePassword(password);
     
     if (!isMatch) {
@@ -113,9 +130,19 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    const token = generateToken(iglesia._id, 'iglesia');
+    // ✅ GENERAR NUEVO SESSION ID
+    const sessionId = generateSessionId();
+    
+    // ✅ ACTUALIZAR SESSION EN DB (invalida sesión anterior)
+    iglesia.currentSessionId = sessionId;
+    iglesia.lastLoginAt = new Date();
+    iglesia.lastLoginDevice = deviceInfo;
+    await iglesia.save();
 
-    console.log('✅ Iglesia login exitoso');
+    const token = generateToken(iglesia._id, 'iglesia', sessionId);
+
+    console.log('✅ Iglesia login exitoso - Nueva sesión creada');
+    console.log('⚠️ Sesiones anteriores invalidadas automáticamente');
 
     res.json({
       success: true,
@@ -172,10 +199,29 @@ router.get('/verify', authMiddleware, async (req, res) => {
 
 // Logout
 router.post('/logout', authMiddleware, async (req, res) => {
-  res.json({
-    success: true,
-    message: 'Sesión cerrada exitosamente.'
-  });
+  try {
+    // ✅ LIMPIAR SESSION ID AL HACER LOGOUT
+    if (req.user.role === 'admin') {
+      await User.findByIdAndUpdate(req.userId, {
+        currentSessionId: null
+      });
+    } else {
+      await Iglesia.findByIdAndUpdate(req.userId, {
+        currentSessionId: null
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Sesión cerrada exitosamente.'
+    });
+  } catch (error) {
+    console.log('Error en logout (ignorado):', error);
+    res.json({
+      success: true,
+      message: 'Sesión cerrada.'
+    });
+  }
 });
 
 export default router;
