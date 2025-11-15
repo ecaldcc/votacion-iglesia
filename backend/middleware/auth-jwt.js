@@ -17,11 +17,10 @@ export const authMiddleware = async (req, res, next) => {
     
     let user;
     
-    // Buscar primero en usuarios (admin)
+    // Buscar usuario según rol
     if (decoded.role === 'admin') {
       user = await User.findById(decoded.userId).select('-password');
     } else {
-      // Buscar en iglesias
       user = await Iglesia.findById(decoded.userId).select('-password');
       if (user) {
         user.role = 'iglesia';
@@ -29,6 +28,7 @@ export const authMiddleware = async (req, res, next) => {
     }
     
     if (!user) {
+      console.log('❌ Usuario no encontrado en BD:', decoded.userId);
       return res.status(401).json({
         success: false,
         message: 'Usuario no encontrado.'
@@ -42,14 +42,53 @@ export const authMiddleware = async (req, res, next) => {
       });
     }
 
-    // ✅ VALIDAR SESSION ID
-    if (user.currentSessionId !== decoded.sessionId) {
-      return res.status(401).json({
-        success: false,
-        message: 'Sesión inválida. Has iniciado sesión en otro dispositivo.',
-        sessionExpired: true,
-        reason: 'other_device'
-      });
+    // ✅ VALIDAR SESSION ID (solo si ambos existen)
+    if (decoded.sessionId && user.currentSessionId) {
+      if (user.currentSessionId !== decoded.sessionId) {
+        console.log('❌ SessionId no coincide');
+        console.log('   Token tiene:', decoded.sessionId.substring(0, 8) + '...');
+        console.log('   BD tiene:', user.currentSessionId.substring(0, 8) + '...');
+        
+        return res.status(401).json({
+          success: false,
+          message: 'Sesión inválida. Has iniciado sesión en otro dispositivo.',
+          sessionExpired: true,
+          reason: 'other_device'
+        });
+      }
+    } else if (decoded.sessionId && !user.currentSessionId) {
+      // Token tiene sessionId pero BD no (posible problema de timing)
+      console.log('⚠️ Token con sessionId pero BD sin sessionId - Posible timing issue');
+      console.log('   Recargando usuario de BD...');
+      
+      // Reintentar carga desde BD
+      if (decoded.role === 'admin') {
+        user = await User.findById(decoded.userId).select('-password');
+      } else {
+        user = await Iglesia.findById(decoded.userId).select('-password');
+        if (user) {
+          user.role = 'iglesia';
+        }
+      }
+      
+      // Si aún no tiene sessionId, hay un problema
+      if (!user.currentSessionId) {
+        console.log('❌ Usuario sigue sin sessionId después de recargar');
+        return res.status(401).json({
+          success: false,
+          message: 'Error de sesión. Por favor, inicia sesión nuevamente.'
+        });
+      }
+      
+      // Validar nuevamente
+      if (user.currentSessionId !== decoded.sessionId) {
+        return res.status(401).json({
+          success: false,
+          message: 'Sesión inválida. Has iniciado sesión en otro dispositivo.',
+          sessionExpired: true,
+          reason: 'other_device'
+        });
+      }
     }
 
     req.user = user;
@@ -64,6 +103,7 @@ export const authMiddleware = async (req, res, next) => {
       });
     }
 
+    console.error('❌ Error en authMiddleware:', error);
     return res.status(401).json({
       success: false,
       message: 'Token inválido.'

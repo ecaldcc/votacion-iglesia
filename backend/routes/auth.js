@@ -37,8 +37,7 @@ router.post('/login', async (req, res) => {
     const userAgent = req.get('user-agent') || 'Desconocido';
     const deviceInfo = userAgent.substring(0, 100);
 
-    // ✅ MEJORAR DETECCIÓN DE ADMIN
-    // Es admin si: código empieza con "ADM", userType es "admin", o no hay nombre de iglesia
+    // Detección de admin
     const esAdmin = codigo.toUpperCase().startsWith('ADM') || 
                     userType === 'admin' || 
                     !nombre;
@@ -46,9 +45,8 @@ router.post('/login', async (req, res) => {
     if (esAdmin) {
       console.log('🔐 Intentando login como ADMIN');
       
-      // ✅ BUSCAR EN USUARIOS (ADMIN)
       const admin = await User.findOne({ 
-        numeroColegiado: codigo.toUpperCase(), // ← Normalizar a mayúsculas
+        numeroColegiado: codigo.toUpperCase(),
         role: 'admin' 
       });
       
@@ -76,19 +74,21 @@ router.post('/login', async (req, res) => {
         });
       }
 
-      // ✅ GENERAR NUEVO SESSION ID
+      // ✅ 1. GENERAR SESSION ID
       const sessionId = generateSessionId();
       
-      // ✅ ACTUALIZAR SESSION EN DB (invalida sesión anterior)
+      // ✅ 2. ACTUALIZAR Y GUARDAR (con await)
       admin.currentSessionId = sessionId;
       admin.lastLoginAt = new Date();
       admin.lastLoginDevice = deviceInfo;
-      await admin.save();
+      await admin.save(); // ← CRUCIAL: Esperar a que se guarde
 
+      // ✅ 3. GENERAR TOKEN DESPUÉS de guardar
       const token = generateToken(admin._id, admin.role, sessionId);
 
-      console.log('✅ Admin login exitoso - SessionId:', sessionId.substring(0, 8) + '...');
-      console.log('⚠️ Sesiones anteriores invalidadas automáticamente');
+      console.log('✅ Admin login exitoso');
+      console.log('   SessionId guardado:', sessionId.substring(0, 8) + '...');
+      console.log('   Token generado con sessionId');
       
       return res.json({
         success: true,
@@ -112,14 +112,12 @@ router.post('/login', async (req, res) => {
     const iglesia = await Iglesia.findOne({ codigo, nombre });
 
     if (!iglesia) {
-      console.log('❌ Iglesia no encontrada con codigo:', codigo, 'y nombre:', nombre);
+      console.log('❌ Iglesia no encontrada');
       return res.status(401).json({
         success: false,
         message: 'Credenciales inválidas. Verifica el código y nombre de la iglesia.'
       });
     }
-
-    console.log('🔍 Iglesia encontrada:', iglesia.nombre);
 
     const isMatch = await iglesia.comparePassword(password);
     
@@ -138,19 +136,20 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // ✅ GENERAR NUEVO SESSION ID
+    // ✅ 1. GENERAR SESSION ID
     const sessionId = generateSessionId();
     
-    // ✅ ACTUALIZAR SESSION EN DB (invalida sesión anterior)
+    // ✅ 2. ACTUALIZAR Y GUARDAR (con await)
     iglesia.currentSessionId = sessionId;
     iglesia.lastLoginAt = new Date();
     iglesia.lastLoginDevice = deviceInfo;
-    await iglesia.save();
+    await iglesia.save(); // ← CRUCIAL: Esperar a que se guarde
 
+    // ✅ 3. GENERAR TOKEN DESPUÉS de guardar
     const token = generateToken(iglesia._id, 'iglesia', sessionId);
 
-    console.log('✅ Iglesia login exitoso - SessionId:', sessionId.substring(0, 8) + '...');
-    console.log('⚠️ Sesiones anteriores invalidadas automáticamente');
+    console.log('✅ Iglesia login exitoso');
+    console.log('   SessionId guardado:', sessionId.substring(0, 8) + '...');
 
     res.json({
       success: true,
@@ -172,7 +171,6 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Obtener lista de iglesias (sin contraseñas)
 router.get('/iglesias', async (req, res) => {
   try {
     const iglesias = await Iglesia.find({ isActive: true })
@@ -193,7 +191,6 @@ router.get('/iglesias', async (req, res) => {
   }
 });
 
-// Verificar token
 router.get('/verify', authMiddleware, async (req, res) => {
   res.json({
     success: true,
@@ -205,10 +202,8 @@ router.get('/verify', authMiddleware, async (req, res) => {
   });
 });
 
-// Logout
 router.post('/logout', authMiddleware, async (req, res) => {
   try {
-    // ✅ LIMPIAR SESSION ID AL HACER LOGOUT
     if (req.user.role === 'admin') {
       await User.findByIdAndUpdate(req.userId, {
         currentSessionId: null
