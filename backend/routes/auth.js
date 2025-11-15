@@ -1,22 +1,21 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
-import crypto from 'crypto'; // ← AGREGAR
+import crypto from 'crypto';
 import User from '../models/user.js';
 import Iglesia from '../models/iglesia.js';
 import { authMiddleware } from '../middleware/auth-jwt.js';
 
 const router = express.Router();
 
-const generateToken = (userId, role, sessionId) => { // ← Agregar sessionId
+const generateToken = (userId, role, sessionId) => {
   const expiresIn = process.env.JWT_EXPIRATION || '24h';
   return jwt.sign(
-    { userId, role, sessionId }, // ← Incluir sessionId en token
+    { userId, role, sessionId },
     process.env.JWT_SECRET || 'secret_key_default',
     { expiresIn }
   );
 };
 
-// ✅ FUNCIÓN PARA GENERAR SESSION ID ÚNICO
 const generateSessionId = () => {
   return crypto.randomBytes(32).toString('hex');
 };
@@ -35,15 +34,23 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // ✅ OBTENER INFO DEL DISPOSITIVO
     const userAgent = req.get('user-agent') || 'Desconocido';
-    const deviceInfo = userAgent.substring(0, 100); // Limitar a 100 caracteres
+    const deviceInfo = userAgent.substring(0, 100);
 
-    // ========== VERIFICAR SI ES ADMIN ==========
-    if (userType === 'admin' || codigo === 'ADMIN' || !nombre) {
+    // ✅ MEJORAR DETECCIÓN DE ADMIN
+    // Es admin si: código empieza con "ADM", userType es "admin", o no hay nombre de iglesia
+    const esAdmin = codigo.toUpperCase().startsWith('ADM') || 
+                    userType === 'admin' || 
+                    !nombre;
+
+    if (esAdmin) {
       console.log('🔐 Intentando login como ADMIN');
       
-      const admin = await User.findOne({ numeroColegiado: codigo, role: 'admin' });
+      // ✅ BUSCAR EN USUARIOS (ADMIN)
+      const admin = await User.findOne({ 
+        numeroColegiado: codigo.toUpperCase(), // ← Normalizar a mayúsculas
+        role: 'admin' 
+      });
       
       if (!admin) {
         console.log('❌ Admin no encontrado');
@@ -72,7 +79,7 @@ router.post('/login', async (req, res) => {
       // ✅ GENERAR NUEVO SESSION ID
       const sessionId = generateSessionId();
       
-      // ✅ ACTUALIZAR SESSION EN DB
+      // ✅ ACTUALIZAR SESSION EN DB (invalida sesión anterior)
       admin.currentSessionId = sessionId;
       admin.lastLoginAt = new Date();
       admin.lastLoginDevice = deviceInfo;
@@ -80,7 +87,8 @@ router.post('/login', async (req, res) => {
 
       const token = generateToken(admin._id, admin.role, sessionId);
 
-      console.log('✅ Admin login exitoso - Nueva sesión creada');
+      console.log('✅ Admin login exitoso - SessionId:', sessionId.substring(0, 8) + '...');
+      console.log('⚠️ Sesiones anteriores invalidadas automáticamente');
       
       return res.json({
         success: true,
@@ -141,7 +149,7 @@ router.post('/login', async (req, res) => {
 
     const token = generateToken(iglesia._id, 'iglesia', sessionId);
 
-    console.log('✅ Iglesia login exitoso - Nueva sesión creada');
+    console.log('✅ Iglesia login exitoso - SessionId:', sessionId.substring(0, 8) + '...');
     console.log('⚠️ Sesiones anteriores invalidadas automáticamente');
 
     res.json({

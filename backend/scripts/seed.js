@@ -15,59 +15,68 @@ import Vote from '../models/vote.js';
 
 const seedDatabase = async () => {
   try {
-    console.log('Iniciando seed de base de datos...\n');
+    console.log('🌱 Iniciando seed de base de datos...\n');
 
     await connectDB();
 
-    console.log(' Limpiando base de datos...');
+    console.log('🧹 Limpiando base de datos...');
     await User.deleteMany({});
     await Iglesia.deleteMany({});
     await Campaign.deleteMany({});
     await Vote.deleteMany({});
-    console.log('Base de datos limpiada\n');
+    console.log('✅ Base de datos limpiada\n');
 
     // ========================================
-    // CREAR USUARIO ADMINISTRADOR
+    // CREAR 2 USUARIOS ADMINISTRADORES
     // ========================================
-    console.log(' Creando usuario administrador...');
-    const admin = await User.create({
-      numeroColegiado: 'ADMIN',
-      nombreCompleto: 'Administrador Sistema',
-      correo: 'admin@iglesias.gt',
+    console.log('👤 Creando usuarios administradores...');
+    
+    const admin1 = await User.create({
+      numeroColegiado: 'ADM001',
+      nombreCompleto: 'Administrador Principal',
+      correo: 'admin1@iglesias.gt',
       dpi: '1234567890101',
       fechaNacimiento: new Date('1990-01-01'),
-      password: 'Admin123',
+      password: 'cambio123',
       role: 'admin',
       isActive: true
     });
-    console.log('Administrador creado\n');
+    console.log('✅ Admin 1 creado: ADM001');
+
+    const admin2 = await User.create({
+      numeroColegiado: 'ADM002',
+      nombreCompleto: 'Administrador Secundario',
+      correo: 'admin2@iglesias.gt',
+      dpi: '1234567890102',
+      fechaNacimiento: new Date('1992-05-15'),
+      password: 'edwar777',
+      role: 'admin',
+      isActive: true
+    });
+    console.log('✅ Admin 2 creado: ADM002\n');
 
     // ========================================
-    // CREAR 20 IGLESIAS
+    // CREAR 15 IGLESIAS CON DATOS REALES
     // ========================================
-    console.log('⛪ Creando 20 iglesias...');
+    console.log('⛪ Creando 15 iglesias...');
     
     const iglesiasData = [
-      { codigo: 'IG001', nombre: 'Senda Milagrosa', votosAsignados: 85, password: 'senda123' },
-      { codigo: 'IG002', nombre: 'Fuente de Vida', votosAsignados: 92, password: 'fuente123' },
-      { codigo: 'IG003', nombre: 'Nuevo Amanecer', votosAsignados: 78, password: 'amanecer123' },
-      { codigo: 'IG004', nombre: 'Casa de Oración', votosAsignados: 65, password: 'oracion123' },
-      { codigo: 'IG005', nombre: 'Monte Sión', votosAsignados: 88, password: 'sion123' },
-      { codigo: 'IG006', nombre: 'Luz del Mundo', votosAsignados: 95, password: 'luz123' },
-      { codigo: 'IG007', nombre: 'Puerta del Cielo', votosAsignados: 72, password: 'puerta123' },
-      { codigo: 'IG008', nombre: 'Roca Eterna', votosAsignados: 80, password: 'roca123' },
-      { codigo: 'IG009', nombre: 'Manantial de Vida', votosAsignados: 90, password: 'manantial123' },
-      { codigo: 'IG010', nombre: 'Estrella de Belén', votosAsignados: 67, password: 'estrella123' },
-      { codigo: 'IG011', nombre: 'Fuego Santo', votosAsignados: 75, password: 'fuego123' },
-      { codigo: 'IG012', nombre: 'Camino de Fe', votosAsignados: 82, password: 'camino123' },
-      { codigo: 'IG013', nombre: 'Árbol de Vida', votosAsignados: 70, password: 'arbol123' },
-      { codigo: 'IG014', nombre: 'Lirio de los Valles', votosAsignados: 86, password: 'lirio123' },
-      { codigo: 'IG015', nombre: 'Pan de Vida', votosAsignados: 93, password: 'pan123' },
-      { codigo: 'IG016', nombre: 'Sal de la Tierra', votosAsignados: 68, password: 'sal123' },
-      { codigo: 'IG017', nombre: 'Piedra Angular', votosAsignados: 77, password: 'piedra123' },
-      { codigo: 'IG018', nombre: 'Viña del Señor', votosAsignados: 84, password: 'vina123' },
-      { codigo: 'IG019', nombre: 'Arca de Salvación', votosAsignados: 89, password: 'arca123' },
-      { codigo: 'IG020', nombre: 'Templo Vivo', votosAsignados: 91, password: 'templo123' },
+      { codigo: 'IG001', nombre: 'Salem', votosAsignados: 35, password: 'salem123' },
+      { codigo: 'IG002', nombre: 'Luz Admirable', votosAsignados: 18, password: 'luz123' },
+      { codigo: 'IG003', nombre: 'Alfa y Omega', votosAsignados: 20, password: 'alfa123' },
+      { codigo: 'IG004', nombre: 'Zoar', votosAsignados: 13, password: 'zoar123' },
+      { codigo: 'IG005', nombre: 'Fuente de Vida', votosAsignados: 48, password: 'fuente123' },
+      { codigo: 'IG006', nombre: 'Shaddai', votosAsignados: 23, password: 'shaddai123' },
+      { codigo: 'IG007', nombre: 'Senda Milagrosa', votosAsignados: 61, password: 'senda123' },
+      { codigo: 'IG008', nombre: 'Samaria', votosAsignados: 25, password: 'samaria123' },
+      { codigo: 'IG009', nombre: 'Sol de Justicia', votosAsignados: 40, password: 'sol123' },
+      { codigo: 'IG010', nombre: 'Peniel', votosAsignados: 20, password: 'peniel123' },
+      { codigo: 'IG011', nombre: 'El Edén', votosAsignados: 20, password: 'eden123' },
+      { codigo: 'IG012', nombre: 'Monte Los Olivos', votosAsignados: 25, password: 'monte123' },
+      { codigo: 'IG013', nombre: 'Belén', votosAsignados: 25, password: 'belen123' },
+      { codigo: 'IG014', nombre: 'Camino de Salvación', votosAsignados: 10, password: 'camino123' },
+      { codigo: 'IG015', nombre: 'Galilea', votosAsignados: 25, password: 'galilea123' },
+      { codigo: 'CONT1', nombre: 'Contingencia', votosAsignados: 50, password: 'Guatemala6.' },
     ];
 
     const iglesias = [];
@@ -77,7 +86,7 @@ const seedDatabase = async () => {
         isActive: true
       });
       iglesias.push(iglesia);
-      console.log(`✅ Iglesia creada: ${iglesia.nombre} (${iglesia.votosAsignados} votos)`);
+      console.log(`✅ Iglesia creada: ${iglesia.nombre.padEnd(25)} - ${String(iglesia.votosAsignados).padStart(2)} votos`);
     }
 
     console.log(`\n✅ ${iglesias.length} iglesias creadas\n`);
@@ -102,27 +111,39 @@ const seedDatabase = async () => {
       fechaFin: fechaFin,
       candidatos: [
         {
-          nombre: 'Pastor José Hernández',
-          foto: 'https://ui-avatars.com/api/?name=Jose+Hernandez&background=4f46e5&color=fff&size=200',
-          propuestas: 'Unidad y crecimiento espiritual de todas las iglesias',
+          nombre: 'Pedro Sanabria',
+          foto: 'https://i.ibb.co/rG2pr86Y/Pedro-Sanabria.jpg',
+          propuestas: 'Pastor - AD Salem',
           votos: 0
         },
         {
-          nombre: 'Pastora María Rodríguez',
-          foto: 'https://ui-avatars.com/api/?name=Maria+Rodriguez&background=059669&color=fff&size=200',
-          propuestas: 'Fortalecimiento de la comunión fraternal',
+          nombre: 'Jimmy García',
+          foto: 'https://i.ibb.co/V0JsMPgs/Jimmy-Garcia.jpg',
+          propuestas: 'Pastor Asistente - AD Samaria',
           votos: 0
         },
         {
-          nombre: 'Pastor Carlos Mendoza',
-          foto: 'https://ui-avatars.com/api/?name=Carlos+Mendoza&background=dc2626&color=fff&size=200',
-          propuestas: 'Expansión del evangelio y misiones',
+          nombre: 'Adonias Montepeque',
+          foto: 'https://i.ibb.co/x8rDN0Wd/Adonias-Montepeque.jpg',
+          propuestas: 'Pastor - AD Alfa y Omega',
+          votos: 0
+        },
+        {
+          nombre: 'Samuel Cotzajay',
+          foto: 'https://i.ibb.co/ZzxdqYvn/Samuel-Cotzajay.jpg',
+          propuestas: 'Pastor Asistente - AD Senda Milagrosa',
+          votos: 0
+        },
+        {
+          nombre: 'Franquil Baten',
+          foto: 'https://i.ibb.co/dJ2vK6Xw/Franquil-Baten.jpg',
+          propuestas: 'Pastor - AD Emmanuel',
           votos: 0
         }
       ],
       totalVotos: 0,
       votosPorIglesia: [],
-      createdBy: admin._id
+      createdBy: admin1._id
     });
 
     console.log('✅ Campaña creada\n');
@@ -130,23 +151,44 @@ const seedDatabase = async () => {
     // ========================================
     // RESUMEN
     // ========================================
-    console.log('═'.repeat(70));
+    console.log('═'.repeat(90));
     console.log('✅ SEED COMPLETADO EXITOSAMENTE');
-    console.log('═'.repeat(70));
+    console.log('═'.repeat(90));
     console.log('\n📋 CREDENCIALES DE PRUEBA:\n');
     
-    console.log('🔑 ADMINISTRADOR:');
-    console.log('Código: ADMIN');
-    console.log('Password: Admin123\n');
+    console.log('🔑 ADMINISTRADORES (2):');
+    console.log('   ┌─────────────────────────────────────────┐');
+    console.log('   │ Usuario: ADM001                         │');
+    console.log('   │ Password: cambio123                     │');
+    console.log('   └─────────────────────────────────────────┘');
+    console.log('   ┌─────────────────────────────────────────┐');
+    console.log('   │ Usuario: ADM002                         │');
+    console.log('   │ Password: edwar98                       │');
+    console.log('   └─────────────────────────────────────────┘\n');
     
-    console.log('⛪ IGLESIAS (20 total):');
-    console.log('─'.repeat(70));
+    console.log('⛪ IGLESIAS (15 total):');
+    console.log('─'.repeat(90));
     iglesiasData.forEach(ig => {
-      console.log(`${ig.codigo} - ${ig.nombre.padEnd(25)} | Password: ${ig.password.padEnd(15)} | Votos: ${ig.votosAsignados}`);
+      console.log(`   ${ig.codigo} - ${ig.nombre.padEnd(25)} | Password: ${ig.password.padEnd(14)} | Votos: ${String(ig.votosAsignados).padStart(2)}`);
     });
-    console.log('─'.repeat(70));
-    console.log(`\n📊 TOTAL DE VOTOS DISPONIBLES: ${totalVotosAsignados}`);
-    console.log('═'.repeat(70));
+    console.log('─'.repeat(90));
+    
+    console.log('\n👥 CANDIDATOS (5 total):');
+    console.log('─'.repeat(90));
+    console.log('   1. Pedro Sanabria');
+    console.log('   2. Jimmy García');
+    console.log('   3. Adonias Montepeque');
+    console.log('   4. Samuel Cotzajay');
+    console.log('   5. Franquil Baten');
+    console.log('─'.repeat(90));
+    
+    console.log(`\n📊 RESUMEN:`);
+    console.log(`   Total Administradores: 2`);
+    console.log(`   Total Iglesias: ${iglesias.length}`);
+    console.log(`   Total Votos Disponibles: ${totalVotosAsignados}`);
+    console.log(`   Total Candidatos: 5`);
+    console.log(`   Campaña: Habilitada y lista para votar`);
+    console.log('═'.repeat(90));
 
     await disconnectDB();
     process.exit(0);
