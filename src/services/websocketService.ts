@@ -61,16 +61,16 @@ class WebSocketService {
         this.socket = null;
 
         // Intentar reconectar automáticamente
-        if (this.reconnectAttempts < this.maxReconnectAttempts) {
-          this.reconnectAttempts++;
-          console.log(`Reintentando conexion (${this.reconnectAttempts}/${this.maxReconnectAttempts})...`);
+        // if (this.reconnectAttempts < this.maxReconnectAttempts) {
+        //   this.reconnectAttempts++;
+        //   console.log(`Reintentando conexion (${this.reconnectAttempts}/${this.maxReconnectAttempts})...`);
           
-          this.reconnectTimeout = setTimeout(() => {
-            this.connect(url);
-          }, this.reconnectDelay);
-        } else {
-          console.error('No se pudo reconectar al WebSocket');
-        }
+        //   this.reconnectTimeout = setTimeout(() => {
+        //     this.connect(url);
+        //   }, this.reconnectDelay);
+        // } else {
+        //   console.error('No se pudo reconectar al WebSocket');
+        // }
       };
     } catch (error) {
       console.error('Error al crear WebSocket:', error);
