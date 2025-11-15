@@ -39,7 +39,10 @@ const seedDatabase = async () => {
       fechaNacimiento: new Date('1990-01-01'),
       password: 'cambio123',
       role: 'admin',
-      isActive: true
+      isActive: true,
+      currentSessionId: null,
+      lastLoginAt: null,
+      lastLoginDevice: null
     });
     console.log('✅ Admin 1 creado: ADM001');
 
@@ -51,14 +54,17 @@ const seedDatabase = async () => {
       fechaNacimiento: new Date('1992-05-15'),
       password: 'edwar777',
       role: 'admin',
-      isActive: true
+      isActive: true,
+      currentSessionId: null,
+      lastLoginAt: null,
+      lastLoginDevice: null
     });
     console.log('✅ Admin 2 creado: ADM002\n');
 
     // ========================================
-    // CREAR 15 IGLESIAS CON DATOS REALES
+    // CREAR 16 IGLESIAS CON DATOS REALES
     // ========================================
-    console.log('⛪ Creando 15 iglesias...');
+    console.log('⛪ Creando 16 iglesias...');
     
     const iglesiasData = [
       { codigo: 'IG001', nombre: 'Salem', votosAsignados: 35, password: 'salem123' },
@@ -83,7 +89,10 @@ const seedDatabase = async () => {
     for (const data of iglesiasData) {
       const iglesia = await Iglesia.create({
         ...data,
-        isActive: true
+        isActive: true,
+        currentSessionId: null,
+        lastLoginAt: null,
+        lastLoginDevice: null
       });
       iglesias.push(iglesia);
       console.log(`✅ Iglesia creada: ${iglesia.nombre.padEnd(25)} - ${String(iglesia.votosAsignados).padStart(2)} votos`);
@@ -163,10 +172,10 @@ const seedDatabase = async () => {
     console.log('   └─────────────────────────────────────────┘');
     console.log('   ┌─────────────────────────────────────────┐');
     console.log('   │ Usuario: ADM002                         │');
-    console.log('   │ Password: edwar98                       │');
+    console.log('   │ Password: edwar777                      │');
     console.log('   └─────────────────────────────────────────┘\n');
     
-    console.log('⛪ IGLESIAS (15 total):');
+    console.log('⛪ IGLESIAS (16 total):');
     console.log('─'.repeat(90));
     iglesiasData.forEach(ig => {
       console.log(`   ${ig.codigo} - ${ig.nombre.padEnd(25)} | Password: ${ig.password.padEnd(14)} | Votos: ${String(ig.votosAsignados).padStart(2)}`);
@@ -175,11 +184,11 @@ const seedDatabase = async () => {
     
     console.log('\n👥 CANDIDATOS (5 total):');
     console.log('─'.repeat(90));
-    console.log('   1. Pedro Sanabria');
-    console.log('   2. Jimmy García');
-    console.log('   3. Adonias Montepeque');
-    console.log('   4. Samuel Cotzajay');
-    console.log('   5. Franquil Baten');
+    console.log('   1. Pedro Sanabria - Pastor AD Salem');
+    console.log('   2. Jimmy García - Pastor Asistente AD Samaria');
+    console.log('   3. Adonias Montepeque - Pastor AD Alfa y Omega');
+    console.log('   4. Samuel Cotzajay - Pastor Asistente AD Senda Milagrosa');
+    console.log('   5. Franquil Baten - Pastor AD Emmanuel');
     console.log('─'.repeat(90));
     
     console.log(`\n📊 RESUMEN:`);

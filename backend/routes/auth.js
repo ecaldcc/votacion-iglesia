@@ -43,20 +43,28 @@ router.post('/login', async (req, res) => {
                     !nombre;
 
     if (esAdmin) {
-      console.log('🔐 Intentando login como ADMIN');
+      console.log('🔐 Intentando login como ADMIN con código:', codigo);
       
+      // Buscar admin (case insensitive)
       const admin = await User.findOne({ 
-        numeroColegiado: codigo.toUpperCase(),
+        numeroColegiado: { $regex: new RegExp(`^${codigo}$`, 'i') },
         role: 'admin' 
       });
       
       if (!admin) {
         console.log('❌ Admin no encontrado');
+        
+        // DEBUG: Ver todos los admins
+        const allAdmins = await User.find({ role: 'admin' }).select('numeroColegiado');
+        console.log('   Admins en BD:', allAdmins.map(a => a.numeroColegiado));
+        
         return res.status(401).json({
           success: false,
           message: 'Credenciales inválidas.'
         });
       }
+
+      console.log('✅ Admin encontrado:', admin.numeroColegiado);
 
       const isMatch = await admin.comparePassword(password);
       if (!isMatch) {
@@ -74,21 +82,21 @@ router.post('/login', async (req, res) => {
         });
       }
 
-      // ✅ 1. GENERAR SESSION ID
+      // Generar session ID
       const sessionId = generateSessionId();
       
-      // ✅ 2. ACTUALIZAR Y GUARDAR (con await)
+      // Actualizar session
       admin.currentSessionId = sessionId;
       admin.lastLoginAt = new Date();
       admin.lastLoginDevice = deviceInfo;
-      await admin.save(); // ← CRUCIAL: Esperar a que se guarde
+      await admin.save();
 
-      // ✅ 3. GENERAR TOKEN DESPUÉS de guardar
+      // Generar token
       const token = generateToken(admin._id, admin.role, sessionId);
 
       console.log('✅ Admin login exitoso');
-      console.log('   SessionId guardado:', sessionId.substring(0, 8) + '...');
-      console.log('   Token generado con sessionId');
+      console.log('   SessionId:', sessionId.substring(0, 8) + '...');
+      console.log('   Guardado en BD:', admin.currentSessionId ? 'SÍ' : 'NO');
       
       return res.json({
         success: true,
@@ -112,12 +120,14 @@ router.post('/login', async (req, res) => {
     const iglesia = await Iglesia.findOne({ codigo, nombre });
 
     if (!iglesia) {
-      console.log('❌ Iglesia no encontrada');
+      console.log('❌ Iglesia no encontrada con codigo:', codigo, 'y nombre:', nombre);
       return res.status(401).json({
         success: false,
         message: 'Credenciales inválidas. Verifica el código y nombre de la iglesia.'
       });
     }
+
+    console.log('✅ Iglesia encontrada:', iglesia.nombre);
 
     const isMatch = await iglesia.comparePassword(password);
     
@@ -136,20 +146,20 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // ✅ 1. GENERAR SESSION ID
+    // Generar session ID
     const sessionId = generateSessionId();
     
-    // ✅ 2. ACTUALIZAR Y GUARDAR (con await)
+    // Actualizar session
     iglesia.currentSessionId = sessionId;
     iglesia.lastLoginAt = new Date();
     iglesia.lastLoginDevice = deviceInfo;
-    await iglesia.save(); // ← CRUCIAL: Esperar a que se guarde
+    await iglesia.save();
 
-    // ✅ 3. GENERAR TOKEN DESPUÉS de guardar
+    // Generar token
     const token = generateToken(iglesia._id, 'iglesia', sessionId);
 
     console.log('✅ Iglesia login exitoso');
-    console.log('   SessionId guardado:', sessionId.substring(0, 8) + '...');
+    console.log('   SessionId:', sessionId.substring(0, 8) + '...');
 
     res.json({
       success: true,
